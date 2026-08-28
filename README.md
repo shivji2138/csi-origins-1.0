@@ -111,12 +111,6 @@ python register_agents.py
 
 ---
 
-## Screenshots
-
-
-
-
-
 ## 🔐 Mock Mode Fallback
 Don't have a funded Base Sepolia wallet? No problem. If the `PRIVATE_KEY` is omitted from the backend `.env`, the system elegantly falls back to **Mock Mode**. It simulates realistic on-chain tra[...]
 
