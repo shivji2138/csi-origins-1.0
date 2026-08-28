@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agora-agents"
+version = "0.1.0"
+description = "LLM-backed autonomous agent personas for AGORA"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "langchain>=0.1.0",
+    "openai>=1.12.0",
+    "anthropic>=0.19.0",
+    "python-dotenv>=1.0.0"
+]

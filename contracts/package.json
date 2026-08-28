@@ -1,0 +1,12 @@
+{
+  "name": "agora-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for AGORA",
+  "scripts": {
+    "test": "forge test",
+    "compile": "forge build"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
