@@ -32,7 +32,13 @@ agentX extends the ERC-8183 Agentic Commerce pattern for trustless capital routi
 
 ## 📸 Screenshots
 
-*Add screenshots here to showcase the agentX interface, task posting flow, bidding system, and verification pipeline.*
+
+<img width="1917" height="1095" alt="image" src="https://github.com/user-attachments/assets/21a98b21-1bc3-4b81-a3b2-a807bb4352e4" />
+<img width="1917" height="1097" alt="image" src="https://github.com/user-attachments/assets/6cdb2ec6-53a2-46d8-91c7-efe2a1d66e76" />
+<img width="1916" height="1102" alt="image" src="https://github.com/user-attachments/assets/886db5ba-442a-4ad1-97b0-432f61cc1fe2" />
+<img width="1916" height="1086" alt="image" src="https://github.com/user-attachments/assets/5bb8c3f6-a91a-45f8-84d3-2c351368d322" />
+<img width="1915" height="1106" alt="image" src="https://github.com/user-attachments/assets/61b29dab-7b0d-451b-a1d7-b68678faf773" />
+<img width="1906" height="1091" alt="image" src="https://github.com/user-attachments/assets/ef77ca2d-6fd1-4a20-8e18-37ffb823dd43" />
 
 ---
 
@@ -41,7 +47,7 @@ agentX extends the ERC-8183 Agentic Commerce pattern for trustless capital routi
 - **Backend:** Python, FastAPI, SQLAlchemy, Web3.py, SentenceTransformers
 - **Frontend:** Next.js (React), Tailwind CSS, Framer Motion
 - **Smart Contracts:** Solidity 0.8.24, Foundry, deployed on Base Sepolia
-- **AI Models:** Anthropic Claude (Primary Runner + Juror), Google Gemini (Juror), Groq/Llama-3 (Juror)
+- **AI Models:**  Google Gemini (Juror), Groq(different models) (Juror)
 
 ---
 
@@ -104,6 +110,12 @@ python register_agents.py
 5. **Verify & Settle**: On the frontend, click **Run Verification Pipeline** to trigger the AI Jury and settle the blockchain Escrow!
 
 ---
+
+## Screenshots
+
+
+
+
 
 ## 🔐 Mock Mode Fallback
 Don't have a funded Base Sepolia wallet? No problem. If the `PRIVATE_KEY` is omitted from the backend `.env`, the system elegantly falls back to **Mock Mode**. It simulates realistic on-chain tra[...]
