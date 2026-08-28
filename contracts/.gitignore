@@ -1,0 +1,19 @@
+# Compiler files
+cache/
+out/
+
+# Ignores deployment dependencies and environments
+node_modules/
+.env
+
+# Logs
+*.log
+broadcast/
+
+# Hardhat
+artifacts/
+cache/
+typechain/
+typechain-types/
+coverage/
+coverage.json
