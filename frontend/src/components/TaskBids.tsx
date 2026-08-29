@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function TaskBids({ taskId, initialStatus }: { taskId: string, initialStatus: string }) {
@@ -10,13 +10,12 @@ export default function TaskBids({ taskId, initialStatus }: { taskId: string, in
   const [status, setStatus] = useState(initialStatus);
   const router = useRouter();
 
-  const fetchBids = async () => {
+  const fetchBids = useCallback(async () => {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
-      const res = await fetch(`${apiUrl}/tasks/${taskId}/bids`);
+      const res = await fetch(`${apiUrl}/tasks/${taskId}/bids`, { cache: 'no-store' });
       if (res.ok) {
         const data = await res.json();
-        // Sort bids by score highest first for the UI (using a naive score if reputation is missing)
         data.sort((a: any, b: any) => {
           const scoreA = (1 / Math.max(0.01, a.bid_amount)) * a.confidence_score;
           const scoreB = (1 / Math.max(0.01, b.bid_amount)) * b.confidence_score;
@@ -29,13 +28,13 @@ export default function TaskBids({ taskId, initialStatus }: { taskId: string, in
     } finally {
       setLoading(false);
     }
-  };
+  }, [taskId]);
 
   useEffect(() => {
     fetchBids();
-    const interval = setInterval(fetchBids, 5000);
+    const interval = setInterval(fetchBids, 3000);
     return () => clearInterval(interval);
-  }, [taskId]);
+  }, [fetchBids]);
 
   const handleCloseBidding = async () => {
     setClosing(true);
@@ -62,68 +61,76 @@ export default function TaskBids({ taskId, initialStatus }: { taskId: string, in
     }
   };
 
-  if (loading) {
-    return <div className="text-zinc-400 p-8 text-center bg-zinc-900 rounded-xl border border-zinc-800">Loading bids...</div>;
+  if (loading && bids.length === 0) {
+    return <div className="text-zinc-400 p-8 text-center bg-zinc-900 rounded-xl border border-zinc-800 font-mono text-xs">Loading marketplace bids...</div>;
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Current Bids</h2>
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h2 className="text-xl font-bold flex items-center gap-2">
+          <span className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-bold">⚡</span>
+          Marketplace Autonomous Bids
+        </h2>
         {status === 'open' && (
           <button 
             onClick={handleCloseBidding} 
             disabled={closing}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
+            className="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-xs font-bold transition-colors disabled:opacity-50"
           >
-            {closing ? 'Resolving...' : 'Close Bidding (Demo)'}
+            {closing ? 'Matching...' : 'Close & Match Bids'}
           </button>
         )}
       </div>
 
       {!bids || bids.length === 0 ? (
-        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-12 text-center">
-          <p className="text-zinc-400">No bids placed yet.</p>
+        <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-8 text-center">
+          <p className="text-zinc-400 text-sm">No agent bids placed yet.</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {bids.map((bid: any, index: number) => {
-            const isWinner = status === 'matched' && index === 0;
+            const isWinner = (status === 'matched' || status === 'verifying' || status === 'completed') && index === 0;
             return (
-              <div key={bid.id} className={`bg-zinc-900 rounded-xl border ${isWinner ? 'border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]' : 'border-zinc-800'} p-6 flex flex-col sm:flex-row gap-6 items-center shadow-lg transition-transform hover:-translate-y-1`}>
-                <div className={`w-16 h-16 shrink-0 rounded-full flex items-center justify-center text-2xl font-bold ${isWinner ? 'bg-gradient-to-br from-green-400 to-green-600' : 'bg-gradient-to-br from-purple-500 to-blue-500'}`}>
-                  {bid.agent_name.charAt(0).toUpperCase()}
-                </div>
-                
-                <div className="flex-1 w-full grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <div>
-                    <h3 className="text-sm font-medium text-zinc-500">Agent</h3>
-                    <p className="font-semibold text-lg">{bid.agent_name}</p>
+              <div 
+                key={bid.id} 
+                className={`bg-zinc-900 rounded-xl border transition-all ${isWinner ? 'border-emerald-500/60 shadow-[0_0_15px_rgba(16,185,129,0.15)]' : 'border-zinc-800'} p-4 md:p-5 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between`}
+              >
+                <div className="flex items-center gap-3.5 min-w-0">
+                  <div className={`w-11 h-11 shrink-0 rounded-full flex items-center justify-center text-base font-bold text-white ${isWinner ? 'bg-gradient-to-br from-emerald-400 to-emerald-600' : 'bg-gradient-to-br from-purple-500 to-blue-500'}`}>
+                    {bid.agent_name?.charAt(0).toUpperCase() || 'A'}
                   </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-zinc-500">Bid Amount</h3>
-                    <p className="font-semibold text-lg text-blue-400">${bid.bid_amount}</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-zinc-500">Confidence</h3>
-                    <p className="font-semibold text-lg text-green-400">{(bid.confidence_score * 100).toFixed(0)}%</p>
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-medium text-zinc-500">Stake Committed</h3>
-                    <p className="font-semibold text-lg text-purple-400">${bid.stake_committed}</p>
+                  
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm text-zinc-100 truncate">{bid.agent_name}</p>
+                    <p className="text-xs text-zinc-500 font-mono">{(bid.confidence_score * 100).toFixed(0)}% Confidence Match</p>
                   </div>
                 </div>
-                
-                {status === 'matched' && (
-                  <div className="shrink-0 text-center">
-                    <span className="text-xs uppercase tracking-wider font-bold text-zinc-500 block mb-1">Status</span>
+
+                <div className="flex flex-wrap items-center gap-6 text-sm">
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-zinc-500 block">Bid Price</span>
+                    <span className="font-bold text-blue-400">${Number(bid.bid_amount).toFixed(2)}</span>
+                  </div>
+                  
+                  <div>
+                    <span className="text-[10px] uppercase font-semibold text-zinc-500 block">Stake Locked</span>
+                    <span className="font-bold text-purple-400">${Number(bid.stake_committed).toFixed(2)}</span>
+                  </div>
+
+                  <div className="shrink-0">
+                    <span className="text-[10px] uppercase font-semibold text-zinc-500 block mb-0.5">Status</span>
                     {isWinner ? (
-                      <span className="px-3 py-1 bg-green-900/40 border border-green-700 text-green-400 rounded-full text-xs font-bold">Winner</span>
+                      <span className="px-2.5 py-1 bg-emerald-950/80 border border-emerald-700/80 text-emerald-400 rounded-md text-xs font-bold">
+                        Winner
+                      </span>
                     ) : (
-                      <span className="px-3 py-1 bg-zinc-800 text-zinc-400 rounded-full text-xs font-medium">Refunded</span>
+                      <span className="px-2.5 py-1 bg-zinc-800 text-zinc-400 rounded-md text-xs font-medium">
+                        {status === 'open' ? 'Pending' : 'Refunded'}
+                      </span>
                     )}
                   </div>
-                )}
+                </div>
               </div>
             );
           })}

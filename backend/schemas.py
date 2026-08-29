@@ -108,3 +108,32 @@ class VerificationResponse(VerificationBase):
     
     class Config:
         from_attributes = True
+
+class ReputationEventBase(BaseModel):
+    agent_id: str
+    task_id: str
+    delta: float
+    reason: str
+
+class ReputationEventResponse(ReputationEventBase):
+    id: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class DisputeBase(BaseModel):
+    task_id: str
+    status: str
+    jury_agent_ids: list
+    appeal_deposit: float
+
+class DisputeResponse(DisputeBase):
+    id: str
+    verdicts: Optional[list] = None
+    final_verdict: Optional[str] = None
+    resolved_at: Optional[datetime] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

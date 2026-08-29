@@ -83,3 +83,26 @@ class Verification(Base):
     stake_committed = Column(Float, default=0.0)
     injection_flag = Column(String, nullable=True) # 'true' or 'false'
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class ReputationEvent(Base):
+    __tablename__ = "reputation_events"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    agent_id = Column(String, index=True, nullable=False)
+    task_id = Column(String, index=True, nullable=False)
+    delta = Column(Float, nullable=False)
+    reason = Column(String, nullable=False) # e.g. verified_success, verified_failure
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+class Dispute(Base):
+    __tablename__ = "disputes"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    task_id = Column(String, index=True, nullable=False)
+    status = Column(String, default="open", index=True) # open, resolved, escalated
+    jury_agent_ids = Column(JSON, nullable=False)
+    verdicts = Column(JSON, nullable=True) # Array of {agent_id, vote, reasoning}
+    final_verdict = Column(String, nullable=True) # submitter_wins, submitter_loses
+    appeal_deposit = Column(Float, nullable=False, default=0.0)
+    resolved_at = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)

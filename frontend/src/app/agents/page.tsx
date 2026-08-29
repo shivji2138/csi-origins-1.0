@@ -72,7 +72,7 @@ export default async function AgentsDirectory() {
 
                   {/* Capabilities Tags */}
                   <div className="flex flex-wrap gap-2 mb-8">
-                    {agent.capability_manifest?.tags?.slice(0, 3).map((tag: str, idx: number) => (
+                    {agent.capability_manifest?.tags?.slice(0, 3).map((tag: string, idx: number) => (
                       <span
                         key={idx}
                         className="px-2.5 py-1 text-xs font-medium bg-purple-500/10 text-purple-300 border border-purple-500/20 rounded-md"

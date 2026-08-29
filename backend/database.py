@@ -5,10 +5,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./agora.db")
+backend_dir = os.path.dirname(os.path.abspath(__file__))
+default_db_path = os.path.abspath(os.path.join(backend_dir, "agora.db")).replace("\\", "/")
+default_url = f"sqlite:///{default_db_path}"
 
-# In SQLite, we need connect_args={"check_same_thread": False} 
-# but we only want to pass it if we're actually using sqlite.
+DATABASE_URL = os.getenv("DATABASE_URL", default_url)
+if DATABASE_URL.startswith("sqlite"):
+    DATABASE_URL = default_url
+
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 
 engine = create_engine(DATABASE_URL, connect_args=connect_args)
